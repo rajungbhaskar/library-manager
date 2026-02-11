@@ -22,6 +22,7 @@ interface LibraryContextType {
     reassignBooks: (oldName: string, newName: string) => void;
     languages: string[];
     addLanguage: (lang: string) => void;
+    deleteLanguage: (lang: string) => void;
 }
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
@@ -210,6 +211,11 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
         }
     };
 
+    const deleteLanguage = (lang: string) => {
+        const newLanguages = languages.filter(l => l !== lang);
+        saveLanguages(newLanguages);
+    };
+
     return (
         <LibraryContext.Provider value={{
             books,
@@ -226,7 +232,8 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
             checkOrphans,
             reassignBooks,
             languages,
-            addLanguage
+            addLanguage,
+            deleteLanguage
         }}>
             {children}
         </LibraryContext.Provider>

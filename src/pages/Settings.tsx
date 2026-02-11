@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import { useSettings } from '../context/SettingsContext';
+import { useLibrary } from '../context/LibraryContext';
 import { Settings as SettingsIcon, DollarSign, Euro, PoundSterling, IndianRupee, Download, Upload, AlertTriangle } from 'lucide-react';
 import AuthorsManager from '../components/AuthorsManager';
 import { storageService, StorageData } from '../services/storageService';
 
 const Settings: React.FC = () => {
     const { settings, updateSettings } = useSettings();
+    const { languages, addLanguage, deleteLanguage } = useLibrary();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const currencies = [
@@ -131,6 +133,85 @@ const Settings: React.FC = () => {
                 <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <AlertTriangle size={14} />
                     <span>Importing will verify structure but overwrite existing data.</span>
+                </div>
+            </div>
+
+            <div className="card settings-card" style={{ marginTop: 'var(--spacing-lg)' }}>
+                <div className="setting-item" style={{ alignItems: 'flex-start' }}>
+                    <div className="setting-label">
+                        <div className="icon-wrapper">
+                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>文</span>
+                        </div>
+                        <div>
+                            <h3>Language Management</h3>
+                            <p>Manage the list of languages available in the dropdown.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginTop: 'var(--spacing-md)' }}>
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            const form = e.target as HTMLFormElement;
+                            const input = form.elements.namedItem('newLanguage') as HTMLInputElement;
+                            if (input.value.trim()) {
+                                addLanguage(input.value);
+                                input.value = '';
+                            }
+                        }}
+                        style={{ display: 'flex', gap: '0.5rem', marginBottom: 'var(--spacing-md)' }}
+                    >
+                        <input
+                            name="newLanguage"
+                            type="text"
+                            placeholder="Add a new language..."
+                            className="currency-select" // Reusing style for consistent input look
+                            style={{ flex: 1, minWidth: 'auto', cursor: 'text' }}
+                        />
+                        <button type="submit" className="btn btn-primary">Add</button>
+                    </form>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {languages.map(lang => (
+                            <div key={lang} style={{
+                                background: 'var(--color-background-muted)',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '1rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                fontSize: '0.9rem',
+                                border: '1px solid var(--color-border)'
+                            }}>
+                                {lang}
+                                <button
+                                    onClick={() => {
+                                        if (confirm(`Remove "${lang}" from the list?`)) {
+                                            deleteLanguage(lang);
+                                        }
+                                    }}
+                                    style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        cursor: 'pointer',
+                                        color: 'var(--color-text-muted)',
+                                        padding: 0,
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                    title="Remove language"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                        {languages.length === 0 && (
+                            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                                No custom languages added yet. Languages from books will still appear in dropdowns.
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
 
