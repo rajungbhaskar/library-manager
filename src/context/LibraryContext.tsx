@@ -23,6 +23,9 @@ interface LibraryContextType {
     languages: string[];
     addLanguage: (lang: string) => void;
     deleteLanguage: (lang: string) => void;
+    publishers: string[];
+    addPublisher: (pub: string) => void;
+    deletePublisher: (pub: string) => void;
 }
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
@@ -39,6 +42,7 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [books, setBooks] = React.useState<Book[]>([]);
     const [authors, setAuthors] = React.useState<Author[]>([]);
     const [languages, setLanguages] = React.useState<string[]>([]);
+    const [publishers, setPublishers] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [authorSortOrder, setAuthorSortOrder] = React.useState<AuthorSortOrder>('asc'); // Default to A-Z for better UX in dropdowns
 
@@ -63,6 +67,7 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
                 setBooks(data.books);
                 setAuthors(data.authors);
                 setLanguages(data.languages || []);
+                setPublishers(data.publishers || []);
             } catch (error) {
                 console.error("Failed to load library data", error);
             } finally {
@@ -85,6 +90,11 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
     const saveLanguages = async (newLanguages: string[]) => {
         setLanguages(newLanguages);
         await storageService.save({ languages: newLanguages });
+    };
+
+    const savePublishers = async (newPublishers: string[]) => {
+        setPublishers(newPublishers);
+        await storageService.save({ publishers: newPublishers });
     };
 
     const addBook = (bookData: Omit<Book, 'id'>) => {
@@ -216,6 +226,21 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
         saveLanguages(newLanguages);
     };
 
+    const addPublisher = (pub: string) => {
+        const trimmed = pub.trim();
+        if (!trimmed) return;
+        const exists = publishers.some(p => p.toLowerCase() === trimmed.toLowerCase());
+        if (!exists) {
+            const newPublishers = [...publishers, trimmed].sort();
+            savePublishers(newPublishers);
+        }
+    };
+
+    const deletePublisher = (pub: string) => {
+        const newPublishers = publishers.filter(p => p !== pub);
+        savePublishers(newPublishers);
+    };
+
     return (
         <LibraryContext.Provider value={{
             books,
@@ -233,7 +258,10 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
             reassignBooks,
             languages,
             addLanguage,
-            deleteLanguage
+            deleteLanguage,
+            publishers,
+            addPublisher,
+            deletePublisher
         }}>
             {children}
         </LibraryContext.Provider>

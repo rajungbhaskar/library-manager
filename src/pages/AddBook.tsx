@@ -5,11 +5,12 @@ import { Book } from '../types';
 import { ArrowLeft, Upload, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 
 const AddBook: React.FC = () => {
-    const { addBook, updateBook, books, languages, addLanguage } = useLibrary();
+    const { addBook, updateBook, books, languages, addLanguage, publishers, addPublisher } = useLibrary();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+    const [showPublisherDropdown, setShowPublisherDropdown] = useState(false);
 
     const [formData, setFormData] = useState<Omit<Book, 'id'>>({
         title: '',
@@ -311,15 +312,66 @@ const AddBook: React.FC = () => {
 
                 <div className="form-group">
                     <label htmlFor="publisher">Publisher</label>
-                    <input
-                        type="text"
-                        id="publisher"
-                        name="publisher"
-                        value={formData.publisher}
-                        onChange={handleChange}
-                        required
-                        placeholder="Publisher Name"
-                    />
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            id="publisher"
+                            name="publisher"
+                            value={formData.publisher}
+                            onChange={(e) => {
+                                handleChange(e);
+                                setShowPublisherDropdown(true);
+                            }}
+                            onFocus={() => setShowPublisherDropdown(true)}
+                            onBlur={() => setTimeout(() => setShowPublisherDropdown(false), 200)}
+                            required
+                            placeholder="Publisher Name"
+                            autoComplete="off"
+                            style={{ paddingRight: '2.5rem' }}
+                        />
+                        <ChevronDown
+                            size={18}
+                            style={{
+                                position: 'absolute',
+                                right: '12px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                color: 'var(--color-text-muted)',
+                                pointerEvents: 'none'
+                            }}
+                        />
+                        {showPublisherDropdown && (
+                            <ul className="custom-dropdown" style={{ zIndex: 10 }}>
+                                {[...new Set([...publishers, ...books.map(b => b.publisher).filter(Boolean)])]
+                                    .filter(p => p.toLowerCase().includes(formData.publisher.toLowerCase()))
+                                    .sort()
+                                    .map((pub, index) => (
+                                        <li
+                                            key={`pub-${index}`}
+                                            onMouseDown={() => {
+                                                setFormData(prev => ({ ...prev, publisher: pub }));
+                                                setShowPublisherDropdown(false);
+                                            }}
+                                        >
+                                            {pub}
+                                        </li>
+                                    ))
+                                }
+                                {formData.publisher &&
+                                    ![...new Set([...publishers, ...books.map(b => b.publisher).filter(Boolean)])]
+                                        .some(p => p.toLowerCase() === formData.publisher.toLowerCase()) && (
+                                        <li className="new-entry" onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            addPublisher(formData.publisher); // Auto-add to managed list
+                                            setFormData(prev => ({ ...prev, publisher: formData.publisher }));
+                                            setShowPublisherDropdown(false);
+                                        }}>
+                                            Add "{formData.publisher}" to list
+                                        </li>
+                                    )}
+                            </ul>
+                        )}
+                    </div>
                 </div>
 
                 <div className="form-row">

@@ -8,6 +8,7 @@ export interface StorageData {
     books: Book[];
     authors: Author[];
     languages: string[];
+    publishers: string[];
     settings: {
         currency: string;
     };
@@ -24,6 +25,7 @@ const defaultData: StorageData = {
     books: [],
     authors: [],
     languages: [],
+    publishers: [],
     settings: {
         currency: '$',
     },
@@ -111,6 +113,7 @@ const sanitizeDataAsync = async (data: StorageData): Promise<StorageData> => {
         authors: validAuthors,
         books: validBooks,
         languages: Array.from(new Set(data.languages || [])).sort(), // Deduplicate and sort languages
+        publishers: Array.from(new Set(data.publishers || [])).sort(), // Deduplicate and sort publishers
     };
 };
 

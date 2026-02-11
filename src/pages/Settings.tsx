@@ -7,7 +7,7 @@ import { storageService, StorageData } from '../services/storageService';
 
 const Settings: React.FC = () => {
     const { settings, updateSettings } = useSettings();
-    const { languages, addLanguage, deleteLanguage } = useLibrary();
+    const { languages, addLanguage, deleteLanguage, publishers, addPublisher, deletePublisher } = useLibrary();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const currencies = [
@@ -217,7 +217,90 @@ const Settings: React.FC = () => {
                 </div>
             </div>
 
-            <AuthorsManager />
+            <div className="settings-layout" style={{ marginTop: 'var(--spacing-lg)' }}>
+                <div style={{ width: '100%', height: '100%' }}>
+                    <AuthorsManager />
+                </div>
+
+                <div className="card settings-card" style={{ marginTop: '2rem' }}>
+                    <div className="setting-item" style={{ alignItems: 'flex-start' }}>
+                        <div className="setting-label">
+                            <div className="icon-wrapper">
+                                <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>P</span>
+                            </div>
+                            <div>
+                                <h3>Publisher Management</h3>
+                                <p>Manage the list of publishers available in the dropdown.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ marginTop: 'var(--spacing-md)' }}>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const form = e.target as HTMLFormElement;
+                                const input = form.elements.namedItem('newPublisher') as HTMLInputElement;
+                                if (input.value.trim()) {
+                                    addPublisher(input.value);
+                                    input.value = '';
+                                }
+                            }}
+                            style={{ display: 'flex', gap: '0.5rem', marginBottom: 'var(--spacing-md)' }}
+                        >
+                            <input
+                                name="newPublisher"
+                                type="text"
+                                placeholder="Add a new publisher..."
+                                className="currency-select" // Reusing style for consistent input look
+                                style={{ flex: 1, minWidth: 'auto', cursor: 'text' }}
+                            />
+                            <button type="submit" className="btn btn-primary">Add</button>
+                        </form>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            {publishers.map(pub => (
+                                <div key={pub} style={{
+                                    background: 'var(--color-background-muted)',
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    fontSize: '0.9rem',
+                                    border: '1px solid var(--color-border)'
+                                }}>
+                                    {pub}
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Remove "${pub}" from the list?`)) {
+                                                deletePublisher(pub);
+                                            }
+                                        }}
+                                        style={{
+                                            border: 'none',
+                                            background: 'transparent',
+                                            cursor: 'pointer',
+                                            color: 'var(--color-text-muted)',
+                                            padding: 0,
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                        title="Remove publisher"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                            {publishers.length === 0 && (
+                                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                                    No custom publishers added yet. Publishers from books will still appear in dropdowns.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <style>{`
                 .page-header {
