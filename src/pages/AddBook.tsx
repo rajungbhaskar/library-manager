@@ -233,15 +233,43 @@ const AddBook: React.FC = () => {
                 <div className="form-row">
                     <div className="form-group">
                         <label htmlFor="language">Language</label>
-                        <input
-                            type="text"
+                        <select
                             id="language"
                             name="language"
                             value={formData.language}
                             onChange={handleChange}
                             required
-                            placeholder="e.g. English"
-                        />
+                        >
+                            <option value="" disabled>Select Language</option>
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Portuguese">Portuguese</option>
+                            <option value="Russian">Russian</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Korean">Korean</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Turkish">Turkish</option>
+                            <option value="Dutch">Dutch</option>
+                            <option value="Polish">Polish</option>
+                            <option value="Swedish">Swedish</option>
+                            <option value="Indonesian">Indonesian</option>
+                            <option value="Vietnamese">Vietnamese</option>
+                            <option value="Thai">Thai</option>
+                            {/* Ensure existing values in edit mode that aren't in the list are preserved/shown */}
+                            {formData.language && ![
+                                'English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese',
+                                'Russian', 'Japanese', 'Chinese', 'Korean', 'Hindi', 'Arabic',
+                                'Turkish', 'Dutch', 'Polish', 'Swedish', 'Indonesian', 'Vietnamese', 'Thai'
+                            ].includes(formData.language) && (
+                                    <option value={formData.language}>{formData.language}</option>
+                                )}
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
                     <div className="form-group">
