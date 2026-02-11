@@ -190,6 +190,7 @@ const AuthorsManager: React.FC = () => {
                     border: 1px solid var(--color-border);
                     border-radius: var(--radius-lg);
                     padding: 1.5rem;
+                    box-shadow: var(--shadow-sm); /* Adding shadow to match card */
                 }
                 .authors-header {
                     display: flex;
@@ -259,7 +260,7 @@ const AuthorsManager: React.FC = () => {
                     justify-content: space-between;
                     align-items: center;
                     padding: 0.75rem;
-                    background: #f9fafb;
+                    background: var(--color-background-muted);
                     border-radius: var(--radius-md);
                     border: 1px solid transparent;
                 }
