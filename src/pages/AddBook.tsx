@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLibrary } from '../context/LibraryContext';
 import { Book } from '../types';
-import { ArrowLeft, Upload, Settings as SettingsIcon } from 'lucide-react';
+import { ArrowLeft, Upload, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 
 const AddBook: React.FC = () => {
     const { addBook, updateBook, books, languages, addLanguage } = useLibrary();
@@ -249,6 +249,18 @@ const AddBook: React.FC = () => {
                                 required
                                 placeholder="e.g. English"
                                 autoComplete="off"
+                                style={{ paddingRight: '2.5rem' }}
+                            />
+                            <ChevronDown
+                                size={18}
+                                style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: 'var(--color-text-muted)',
+                                    pointerEvents: 'none'
+                                }}
                             />
                             {showLanguageDropdown && (
                                 <ul className="custom-dropdown" style={{ zIndex: 10 }}>
