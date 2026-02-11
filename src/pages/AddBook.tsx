@@ -5,10 +5,11 @@ import { Book } from '../types';
 import { ArrowLeft, Upload, Settings as SettingsIcon } from 'lucide-react';
 
 const AddBook: React.FC = () => {
-    const { addBook, updateBook, books } = useLibrary();
+    const { addBook, updateBook, books, languages, addLanguage } = useLibrary();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
+    const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
     const [formData, setFormData] = useState<Omit<Book, 'id'>>({
         title: '',
@@ -233,43 +234,54 @@ const AddBook: React.FC = () => {
                 <div className="form-row">
                     <div className="form-group">
                         <label htmlFor="language">Language</label>
-                        <select
-                            id="language"
-                            name="language"
-                            value={formData.language}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="" disabled>Select Language</option>
-                            <option value="English">English</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="French">French</option>
-                            <option value="German">German</option>
-                            <option value="Italian">Italian</option>
-                            <option value="Portuguese">Portuguese</option>
-                            <option value="Russian">Russian</option>
-                            <option value="Japanese">Japanese</option>
-                            <option value="Chinese">Chinese</option>
-                            <option value="Korean">Korean</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="Arabic">Arabic</option>
-                            <option value="Turkish">Turkish</option>
-                            <option value="Dutch">Dutch</option>
-                            <option value="Polish">Polish</option>
-                            <option value="Swedish">Swedish</option>
-                            <option value="Indonesian">Indonesian</option>
-                            <option value="Vietnamese">Vietnamese</option>
-                            <option value="Thai">Thai</option>
-                            {/* Ensure existing values in edit mode that aren't in the list are preserved/shown */}
-                            {formData.language && ![
-                                'English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese',
-                                'Russian', 'Japanese', 'Chinese', 'Korean', 'Hindi', 'Arabic',
-                                'Turkish', 'Dutch', 'Polish', 'Swedish', 'Indonesian', 'Vietnamese', 'Thai'
-                            ].includes(formData.language) && (
-                                    <option value={formData.language}>{formData.language}</option>
-                                )}
-                            <option value="Other">Other</option>
-                        </select>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                id="language"
+                                name="language"
+                                value={formData.language}
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    setShowLanguageDropdown(true);
+                                }}
+                                onFocus={() => setShowLanguageDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowLanguageDropdown(false), 200)}
+                                required
+                                placeholder="e.g. English"
+                                autoComplete="off"
+                            />
+                            {showLanguageDropdown && (
+                                <ul className="custom-dropdown" style={{ zIndex: 10 }}>
+                                    {[...new Set([...languages, ...books.map(b => b.language).filter(Boolean)])]
+                                        .filter(l => l.toLowerCase().includes(formData.language.toLowerCase()))
+                                        .sort()
+                                        .map((lang, index) => (
+                                            <li
+                                                key={`lang-${index}`}
+                                                onMouseDown={() => {
+                                                    setFormData(prev => ({ ...prev, language: lang }));
+                                                    setShowLanguageDropdown(false);
+                                                }}
+                                            >
+                                                {lang}
+                                            </li>
+                                        ))
+                                    }
+                                    {formData.language &&
+                                        ![...new Set([...languages, ...books.map(b => b.language).filter(Boolean)])]
+                                            .some(l => l.toLowerCase() === formData.language.toLowerCase()) && (
+                                            <li className="new-entry" onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                addLanguage(formData.language); // Auto-add to managed list
+                                                setFormData(prev => ({ ...prev, language: formData.language }));
+                                                setShowLanguageDropdown(false);
+                                            }}>
+                                                Add "{formData.language}" to list
+                                            </li>
+                                        )}
+                                </ul>
+                            )}
+                        </div>
                     </div>
 
                     <div className="form-group">

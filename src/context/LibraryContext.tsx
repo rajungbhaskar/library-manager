@@ -20,6 +20,8 @@ interface LibraryContextType {
     setAuthorSortOrder: (order: AuthorSortOrder) => void;
     checkOrphans: () => string[];
     reassignBooks: (oldName: string, newName: string) => void;
+    languages: string[];
+    addLanguage: (lang: string) => void;
 }
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export const useLibrary = () => {
 export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [books, setBooks] = React.useState<Book[]>([]);
     const [authors, setAuthors] = React.useState<Author[]>([]);
+    const [languages, setLanguages] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [authorSortOrder, setAuthorSortOrder] = React.useState<AuthorSortOrder>('asc'); // Default to A-Z for better UX in dropdowns
 
@@ -58,6 +61,7 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
                 const data = await storageService.load();
                 setBooks(data.books);
                 setAuthors(data.authors);
+                setLanguages(data.languages || []);
             } catch (error) {
                 console.error("Failed to load library data", error);
             } finally {
@@ -75,6 +79,11 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
     const saveAuthors = async (newAuthors: Author[]) => {
         setAuthors(newAuthors);
         await storageService.save({ authors: newAuthors });
+    };
+
+    const saveLanguages = async (newLanguages: string[]) => {
+        setLanguages(newLanguages);
+        await storageService.save({ languages: newLanguages });
     };
 
     const addBook = (bookData: Omit<Book, 'id'>) => {
@@ -203,7 +212,9 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
             authorSortOrder,
             setAuthorSortOrder,
             checkOrphans,
-            reassignBooks
+            reassignBooks,
+            languages,
+            addLanguage
         }}>
             {children}
         </LibraryContext.Provider>

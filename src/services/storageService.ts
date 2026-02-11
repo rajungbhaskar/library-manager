@@ -7,6 +7,7 @@ const STORAGE_KEY = 'my-shelf-data';
 export interface StorageData {
     books: Book[];
     authors: Author[];
+    languages: string[];
     settings: {
         currency: string;
     };
@@ -22,6 +23,7 @@ interface PersistedData {
 const defaultData: StorageData = {
     books: [],
     authors: [],
+    languages: [],
     settings: {
         currency: '$',
     },
@@ -108,6 +110,7 @@ const sanitizeDataAsync = async (data: StorageData): Promise<StorageData> => {
         ...data,
         authors: validAuthors,
         books: validBooks,
+        languages: Array.from(new Set(data.languages || [])).sort(), // Deduplicate and sort languages
     };
 };
 
