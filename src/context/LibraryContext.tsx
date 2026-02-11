@@ -198,6 +198,18 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
         return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading Library...</div>;
     }
 
+    const addLanguage = (lang: string) => {
+        const trimmed = lang.trim();
+        if (!trimmed) return;
+
+        // Case insensitive duplicate check
+        const exists = languages.some(l => l.toLowerCase() === trimmed.toLowerCase());
+        if (!exists) {
+            const newLanguages = [...languages, trimmed].sort();
+            saveLanguages(newLanguages);
+        }
+    };
+
     return (
         <LibraryContext.Provider value={{
             books,
