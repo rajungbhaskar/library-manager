@@ -73,7 +73,7 @@ const AuthorsManager: React.FC = () => {
     };
 
     return (
-        <div className="authors-manager">
+        <div className="authors-manager card">
             <div className="authors-header">
                 <h3>Manage Authors</h3>
                 <button onClick={toggleSort} className="icon-btn sort-btn" title="Sort Authors">
@@ -186,11 +186,7 @@ const AuthorsManager: React.FC = () => {
             <style>{`
                 .authors-manager {
                     margin-top: 2rem;
-                    background: var(--color-background);
-                    border: 1px solid var(--color-border);
-                    border-radius: var(--radius-lg);
-                    padding: 1.5rem;
-                    box-shadow: var(--shadow-sm); /* Adding shadow to match card */
+                    /* Card styles inherited from .card class */
                 }
                 .authors-header {
                     display: flex;
