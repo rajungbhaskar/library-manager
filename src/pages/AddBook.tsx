@@ -303,9 +303,10 @@ const AddBook: React.FC = () => {
                             type="number"
                             id="pages"
                             name="pages"
-                            value={formData.pages}
+                            value={formData.pages || ''}
                             onChange={handleChange}
                             min="0"
+                            placeholder="0"
                         />
                     </div>
                 </div>
@@ -445,10 +446,11 @@ const AddBook: React.FC = () => {
                             type="number"
                             id="price"
                             name="price"
-                            value={formData.price}
+                            value={formData.price || ''}
                             onChange={handleChange}
                             min="0"
                             step="0.01"
+                            placeholder="0.00"
                             disabled={formData.isGifted}
                             style={{ backgroundColor: formData.isGifted ? 'var(--color-background-muted)' : 'var(--color-background)' }}
                         />
@@ -478,10 +480,11 @@ const AddBook: React.FC = () => {
                             type="number"
                             id="currentPage"
                             name="currentPage"
-                            value={formData.currentPage || 0}
+                            value={formData.currentPage || ''}
                             onChange={handleChange}
                             min="0"
                             max={formData.pages}
+                            placeholder="0"
                         />
                     </div>
                 )}
