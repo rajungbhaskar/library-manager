@@ -236,6 +236,7 @@ const Settings: React.FC = () => {
                 }
                 .settings-card {
                     width: 100%;
+                    height: 100%;
                 }
                 .setting-item {
                     display: flex;
