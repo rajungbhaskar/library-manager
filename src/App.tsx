@@ -12,8 +12,6 @@ import { SettingsProvider } from './context/SettingsContext';
 import { LibraryProvider } from './context/LibraryContext';
 import Settings from './pages/Settings';
 
-import ProtectedRoute from './components/ProtectedRoute';
-
 function App() {
     return (
         <SettingsProvider>
@@ -22,7 +20,7 @@ function App() {
                     <Routes>
                         <Route path="/signin" element={<SignIn />} />
                         <Route path="/signup" element={<SignUp />} />
-                        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                        <Route path="/" element={<Layout />}>
                             <Route index element={<Dashboard />} />
                             <Route path="library" element={<Library />} />
                             <Route path="add" element={<AddBook />} />
