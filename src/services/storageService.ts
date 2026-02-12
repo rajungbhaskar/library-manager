@@ -2,7 +2,7 @@ import { get, set } from 'idb-keyval';
 import { Book, Author } from '../types';
 import { validateBook, validateAuthor, validateImage, validateImageContent, MAX_AUTHOR_IMAGE_SIZE_BYTES } from '../utils/validators';
 
-const STORAGE_KEY = 'my-shelf-data';
+const DEFAULT_STORAGE_KEY = 'my-shelf-data';
 
 export interface StorageData {
     books: Book[];
@@ -118,11 +118,11 @@ const sanitizeDataAsync = async (data: StorageData): Promise<StorageData> => {
 };
 
 export const storageService = {
-    load: async (): Promise<StorageData> => {
+    load: async (key: string = DEFAULT_STORAGE_KEY): Promise<StorageData> => {
         try {
             // 1. Check if we need to migrate from localStorage (Legacy Web Only)
-            const legacy = localStorage.getItem(STORAGE_KEY);
-            const stored = await get<PersistedData | StorageData>(STORAGE_KEY);
+            const legacy = localStorage.getItem(key);
+            const stored = await get<PersistedData | StorageData>(key);
 
             if (!stored && legacy) {
                 console.log("Migrating data from localStorage to IDB (Legacy -> V1)...");
@@ -139,7 +139,7 @@ export const storageService = {
                         const sanitized = await sanitizeDataAsync(migratedData);
 
                         // Save immediately to IDB with version
-                        await set(STORAGE_KEY, {
+                        await set(key, {
                             version: STORAGE_VERSION,
                             data: sanitized
                         });
@@ -190,9 +190,9 @@ export const storageService = {
         }
     },
 
-    save: async (data: Partial<StorageData>) => {
+    save: async (data: Partial<StorageData>, key: string = DEFAULT_STORAGE_KEY) => {
         try {
-            const stored = await get<PersistedData | StorageData>(STORAGE_KEY);
+            const stored = await get<PersistedData | StorageData>(key);
             let current: StorageData;
 
             if (stored && 'version' in stored && 'data' in stored) {
@@ -208,7 +208,7 @@ export const storageService = {
             // Ideally the UI/Context shouldn't send bad data, but this is the final guardrail.
             const sanitized = await sanitizeDataAsync(newData);
 
-            await set(STORAGE_KEY, {
+            await set(key, {
                 version: STORAGE_VERSION,
                 data: sanitized
             });
@@ -220,10 +220,10 @@ export const storageService = {
         }
     },
 
-    replace: async (data: StorageData) => {
+    replace: async (data: StorageData, key: string = DEFAULT_STORAGE_KEY) => {
         try {
             const sanitized = await sanitizeDataAsync(data);
-            await set(STORAGE_KEY, {
+            await set(key, {
                 version: STORAGE_VERSION,
                 data: sanitized
             });

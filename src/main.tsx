@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
-import { LibraryProvider } from './context/LibraryContext'
 import './styles/global.css'
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
@@ -45,9 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <ErrorBoundary>
             <BrowserRouter>
-                <LibraryProvider>
-                    <App />
-                </LibraryProvider>
+                <App />
             </BrowserRouter>
         </ErrorBoundary>
     </React.StrictMode>,

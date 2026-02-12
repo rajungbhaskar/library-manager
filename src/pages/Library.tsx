@@ -1,34 +1,26 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLibrary } from '../context/LibraryContext';
-import { BookOpen, Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, Search, ChevronDown, LayoutGrid, ArrowDownAZ, ArrowUpAZ, ChevronLeft, ChevronRight, Moon } from 'lucide-react';
 import BookCard from '../components/BookCard';
-import FilterBar from '../components/FilterBar';
-
-import ShelfIcon from '../components/ShelfIcon';
 
 const Library: React.FC = () => {
   const { books, deleteBook } = useLibrary();
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Filter States
   const [filters, setFilters] = useState({
-    author: '',
     status: '',
     language: ''
   });
-
-  // Sort State
-  const [sortConfig, setSortConfig] = useState<{
-    key: 'purchaseDate' | 'price' | 'title';
-    direction: 'asc' | 'desc';
-  }>({
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({
     key: 'title',
     direction: 'asc'
   });
 
-  // Derived Lists for Dropdowns
-  const authors = [...new Set(books.map(b => b.author))].sort();
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Derived Lists
   const languages = [...new Set(books.map(b => b.language).filter(Boolean))].sort();
 
   // Filter & Sort Logic
@@ -36,39 +28,30 @@ const Library: React.FC = () => {
     .filter(book => {
       const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.author.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesAuthor = filters.author ? book.author === filters.author : true;
       const matchesStatus = filters.status ? book.status === filters.status : true;
       const matchesLanguage = filters.language ? book.language === filters.language : true;
-
-      return matchesSearch && matchesAuthor && matchesStatus && matchesLanguage;
+      return matchesSearch && matchesStatus && matchesLanguage;
     })
     .sort((a, b) => {
       let comparison = 0;
-      switch (sortConfig.key) {
-        case 'purchaseDate':
-          comparison = (a.purchaseDate || '').localeCompare(b.purchaseDate || '');
-          break;
-        case 'price':
-          comparison = (a.price || 0) - (b.price || 0);
-          break;
-        case 'title':
-          comparison = a.title.localeCompare(b.title);
-          break;
+      if (sortConfig.key === 'title') {
+        comparison = a.title.localeCompare(b.title);
       }
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
 
-  const handleFilterChange = (key: 'author' | 'status' | 'language', value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
+  const currentBooks = filteredBooks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  const handleSortChange = (key: 'purchaseDate' | 'price' | 'title') => {
-    setSortConfig(prev => {
-      if (prev.key === key) {
-        return { ...prev, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
-      }
-      return { key, direction: 'asc' };
-    });
+  const handleSortToggle = () => {
+    setSortConfig(prev => ({
+      key: 'title',
+      direction: prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
   const handleDelete = (id: string) => {
@@ -77,190 +60,440 @@ const Library: React.FC = () => {
     }
   };
 
+  // Stats
+  const totalBooks = books.length;
+  const completedBooks = books.filter(b => b.status === 'Completed').length;
+  const readingBooks = books.filter(b => b.status === 'Reading').length;
+
   return (
-    <div>
+    <div className="library-page">
       <header className="library-header">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '2rem', fontWeight: '900', color: 'var(--color-text)', letterSpacing: '1px', lineHeight: 1, marginBottom: '0.5rem' }}>
-            <span>MY-S</span>
-            <ShelfIcon size="1.2em" />
-            <span>ELF</span>
-          </div>
-          <p style={{ color: 'var(--color-text-muted)' }}>Where your books belong</p>
+          <h1 className="page-title">Your Library</h1>
+          <p className="page-subtitle">Curate your personal digital sanctuary.</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Link to="/add" className="btn btn-primary">
-            <Plus size={20} style={{ marginRight: '0.5rem' }} /> Add Book
+        <div className="header-actions">
+          <button className="icon-btn theme-toggle">
+            <Moon size={20} />
+          </button>
+          <Link to="/add" className="btn btn-primary add-book-btn">
+            <Plus size={18} />
+            <span>Add New Book</span>
           </Link>
         </div>
       </header>
 
-      <>
-        <div className="search-container">
-          <div className={`search-wrapper ${searchTerm ? 'active' : ''}`}>
-            <Search size={20} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search your library..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button
-                className="clear-search-btn"
-                onClick={() => setSearchTerm('')}
-                aria-label="Clear search"
-              >
-                <Trash2 size={16} style={{ transform: 'rotate(45deg)' }} /> {/* Using Trash as X for now or add X icon */}
-              </button>
-            )}
-          </div>
+      {/* Combined Search & Filter Bar */}
+      <div className="search-filter-bar">
+        <div className="search-section">
+          <Search size={18} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by title, author..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
         </div>
 
-        <FilterBar
-          authors={authors}
-          languages={languages}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          sortConfig={sortConfig}
-          onSortChange={handleSortChange}
-        />
+        <div className="divider"></div>
 
-        {filteredBooks.length === 0 ? (
+        <div className="filter-dropdown">
+          <select
+            value={filters.status}
+            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+            className="filter-select"
+          >
+            <option value="">All Statuses</option>
+            <option value="To Read">To Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <ChevronDown size={14} className="dropdown-icon" />
+        </div>
+
+        <div className="divider"></div>
+
+        <div className="filter-dropdown">
+          <select
+            value={filters.language}
+            onChange={(e) => setFilters(prev => ({ ...prev, language: e.target.value }))}
+            className="filter-select"
+          >
+            <option value="">All Languages</option>
+            {languages.map(lang => (
+              <option key={lang} value={lang}>{lang}</option>
+            ))}
+          </select>
+          <ChevronDown size={14} className="dropdown-icon" />
+        </div>
+
+        <div className="divider"></div>
+
+        <div className="view-controls">
+          <button className="icon-btn active" title="Grid View">
+            <LayoutGrid size={18} />
+          </button>
+          <button className="icon-btn" title="Sort A-Z" onClick={handleSortToggle}>
+            {sortConfig.direction === 'asc' ? <ArrowDownAZ size={18} /> : <ArrowUpAZ size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Book Grid */}
+      <div className="book-grid-container">
+        {currentBooks.length === 0 ? (
           <div className="empty-state">
-            <BookOpen size={48} color="var(--color-text-muted)" />
-            <p>No books found matching your criteria.</p>
-            {(searchTerm || filters.author || filters.status || filters.language) && (
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  setSearchTerm('');
-                  setFilters({ author: '', status: '', language: '' });
-                }}
-                style={{ marginTop: '1rem' }}
-              >
-                Clear All Filters
-              </button>
-            )}
+            <p>No books found.</p>
           </div>
         ) : (
           <div className="book-grid">
-            {filteredBooks.map(book => (
+            {currentBooks.map(book => (
               <BookCard key={book.id} book={book} onDelete={handleDelete} />
             ))}
+
+            {/* Add New Title Placeholder Card */}
+            <Link to="/add" className="add-placeholder-card">
+              <div className="add-icon-circle">
+                <Plus size={24} />
+              </div>
+              <span>Add New Title</span>
+            </Link>
           </div>
         )}
-      </>
+      </div>
+
+      {/* Footer Stats & Pagination */}
+      <footer className="library-footer">
+        <div className="stats-row">
+          <div className="stat-item">
+            <span className="stat-label">TOTAL BOOKS</span>
+            <span className="stat-value">{totalBooks}</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <span className="stat-label">COMPLETED</span>
+            <span className="stat-value text-green">{completedBooks}</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <span className="stat-label">CURRENT</span>
+            <span className="stat-value text-orange">{readingBooks}</span>
+          </div>
+        </div>
+
+        <div className="pagination">
+          <button
+            className="page-btn nav"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              className={`page-btn ${currentPage === page ? 'active' : ''}`}
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            className="page-btn nav"
+            disabled={currentPage === totalPages || totalPages === 0}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </footer>
 
       <style>{`
-        .library-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: var(--spacing-lg);
-        }
-        
-        /* New Search Styles */
-        .search-container {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 2rem;
-        }
+                .library-page {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    gap: 2rem;
+                    /* font-family: 'DM Sans', sans-serif; -- Assuming inherited font */
+                }
 
-        .search-wrapper {
-          position: relative;
-          width: 100%;
-          max-width: 600px;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 9999px; /* Pill shape */
-          padding: 0.75rem 1rem 0.75rem 3rem;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          display: flex;
-          align-items: center;
-        }
+                .library-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                }
+                .page-title {
+                    font-size: 2rem;
+                    font-weight: 800;
+                    color: #1e293b;
+                    margin-bottom: 0.25rem;
+                    letter-spacing: -0.03em;
+                }
+                .page-subtitle {
+                    color: #64748b;
+                    font-size: 0.95rem;
+                }
 
-        .search-wrapper:hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
-        }
+                .header-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                }
+                .theme-toggle {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: white;
+                    border: 1px solid #e2e8f0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .theme-toggle:hover {
+                    color: #4f46e5;
+                    border-color: #4f46e5;
+                }
+                .add-book-btn {
+                    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.25rem;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+                    transition: all 0.2s;
+                }
+                .add-book-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.5);
+                }
 
-        .search-wrapper:focus-within {
-          transform: translateY(-2px) scale(1.01);
-          box-shadow: 
-            0 10px 15px -3px rgba(0, 0, 0, 0.1), 
-            0 4px 6px -2px rgba(0, 0, 0, 0.05),
-            0 0 0 2px var(--color-primary); /* Focus Ring */
-          background: rgba(255, 255, 255, 0.95);
-        }
+                /* Search Filter Bar */
+                .search-filter-bar {
+                    background: white;
+                    border-radius: 99px; /* Pill shape */
+                    padding: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                    border: 1px solid #e5e7eb;
+                }
 
-        .search-icon {
-          position: absolute;
-          left: 1.25rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: var(--color-text-muted);
-          pointer-events: none;
-          transition: color 0.2s;
-        }
+                .search-section {
+                    display: flex;
+                    align-items: center;
+                    flex: 2;
+                    padding-left: 1rem;
+                }
+                .search-icon {
+                    color: #94a3b8;
+                    margin-right: 0.5rem;
+                }
+                .search-input {
+                    border: none;
+                    outline: none;
+                    width: 100%;
+                    font-size: 0.95rem;
+                    color: #1e293b;
+                }
+                .search-input::placeholder {
+                    color: #cbd5e1;
+                }
 
-        .search-wrapper:focus-within .search-icon {
-          color: var(--color-primary);
-        }
+                .divider {
+                    width: 1px;
+                    height: 24px;
+                    background-color: #e2e8f0;
+                    margin: 0 0.5rem;
+                }
 
-        .search-wrapper input {
-          width: 100%;
-          border: none;
-          background: transparent;
-          font-size: 1.1rem;
-          color: var(--color-text);
-          outline: none;
-          padding: 0;
-          margin: 0;
-          height: 100%;
-        }
+                .filter-dropdown {
+                    display: flex;
+                    align-items: center;
+                    position: relative;
+                    padding: 0 1rem;
+                    cursor: pointer;
+                }
+                .filter-select {
+                    appearance: none;
+                    border: none;
+                    background: transparent;
+                    font-size: 0.9rem;
+                    color: #64748b;
+                    font-weight: 500;
+                    cursor: pointer;
+                    padding-right: 1.5rem;
+                    outline: none;
+                }
+                .dropdown-icon {
+                    position: absolute;
+                    right: 0.5rem;
+                    color: #94a3b8;
+                    pointer-events: none;
+                }
 
-        .search-wrapper input::placeholder {
-           color: var(--color-text-muted);
-           opacity: 0.7;
-        }
+                .view-controls {
+                    display: flex;
+                    gap: 0.5rem;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                }
+                .icon-btn {
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 8px;
+                    color: #94a3b8;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .icon-btn:hover {
+                    background: #f1f5f9;
+                    color: #475569;
+                }
+                .icon-btn.active {
+                    background: #e0e7ff;
+                    color: #4f46e5;
+                }
 
-        .clear-search-btn {
-          background: none;
-          border: none;
-          color: var(--color-text-muted);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0.25rem;
-          margin-left: 0.5rem;
-          border-radius: 50%;
-          transition: all 0.2s;
-        }
+                /* Book Grid */
+                .book-grid-container {
+                    flex: 1;
+                }
+                .book-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                    gap: 2rem;
+                }
 
-        .clear-search-btn:hover {
-          background-color: rgba(0,0,0,0.05);
-          color: var(--color-danger);
-        }
+                .add-placeholder-card {
+                    border: 2px dashed #cbd5e1;
+                    border-radius: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    color: #94a3b8;
+                    cursor: pointer;
+                    text-decoration: none;
+                    transition: all 0.2s;
+                    min-height: 340px; /* Match Match BookCard height */
+                }
+                .add-placeholder-card:hover {
+                    border-color: #94a3b8;
+                    background-color: #f8fafc;
+                    color: #64748b;
+                }
+                .add-icon-circle {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    background: #f1f5f9;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 0.5rem;
+                    color: inherit;
+                }
 
-        .book-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Adjusted minmax for card width */
-          gap: var(--spacing-lg);
-        }
-        
-        .empty-state {
-          text-align: center;
-          padding: var(--spacing-xl);
-          color: var(--color-text-muted);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: var(--spacing-md);
-        }
-      `}</style>
+                /* Footer */
+                .library-footer {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 1.5rem;
+                    margin-bottom: 1rem;
+                }
+                
+                .stats-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 2rem;
+                }
+                .stat-item {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .stat-label {
+                    font-size: 0.65rem;
+                    color: #94a3b8;
+                    font-weight: 700;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 2px;
+                }
+                .stat-value {
+                    font-size: 1.1rem;
+                    font-weight: 800;
+                    color: #1e293b;
+                    line-height: 1;
+                }
+                .stat-value.text-green { color: #10b981; }
+                .stat-value.text-orange { color: #f59e0b; }
+
+                .stat-divider {
+                    width: 1px;
+                    height: 24px;
+                    background-color: #e2e8f0;
+                }
+
+                .pagination {
+                    display: flex;
+                    gap: 0.5rem;
+                }
+                .page-btn {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    border: 1px solid transparent;
+                    background: white;
+                    color: #64748b;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s;
+                }
+                .page-btn:hover:not(:disabled) {
+                    background: #f1f5f9;
+                    color: #1e293b;
+                }
+                .page-btn.active {
+                    background: #6366f1;
+                    color: white;
+                    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+                }
+                .page-btn.nav {
+                    background: #f8fafc;
+                    border-color: #e2e8f0;
+                }
+                .page-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                
+                .empty-state {
+                    text-align: center;
+                    padding: 3rem;
+                    color: #94a3b8;
+                    grid-column: 1 / -1;
+                }
+            `}</style>
     </div>
   );
 };

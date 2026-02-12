@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { storageService } from '../services/storageService';
 import { Book, Author } from '../types';
 import { validateBook } from '../utils/validators';
+import { useAuth } from './AuthContext';
 
 export type AuthorSortOrder = 'asc' | 'desc' | 'none';
 
@@ -39,12 +40,15 @@ export const useLibrary = () => {
 };
 
 export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { user } = useAuth();
+    const storageKey = useMemo(() => user ? `library-data-${user.id}` : 'library-data-guest', [user]);
+
     const [books, setBooks] = React.useState<Book[]>([]);
     const [authors, setAuthors] = React.useState<Author[]>([]);
     const [languages, setLanguages] = React.useState<string[]>([]);
     const [publishers, setPublishers] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState(true);
-    const [authorSortOrder, setAuthorSortOrder] = React.useState<AuthorSortOrder>('asc'); // Default to A-Z for better UX in dropdowns
+    const [authorSortOrder, setAuthorSortOrder] = React.useState<AuthorSortOrder>('asc');
 
     // Sort authors derived state
     const sortedAuthors = useMemo(() => {
@@ -62,8 +66,9 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     React.useEffect(() => {
         const loadData = async () => {
+            setLoading(true);
             try {
-                const data = await storageService.load();
+                const data = await storageService.load(storageKey);
                 setBooks(data.books);
                 setAuthors(data.authors);
                 setLanguages(data.languages || []);
@@ -75,26 +80,26 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
             }
         };
         loadData();
-    }, []);
+    }, [storageKey]);
 
     const saveBooks = async (newBooks: Book[]) => {
         setBooks(newBooks);
-        await storageService.save({ books: newBooks });
+        await storageService.save({ books: newBooks }, storageKey);
     };
 
     const saveAuthors = async (newAuthors: Author[]) => {
         setAuthors(newAuthors);
-        await storageService.save({ authors: newAuthors });
+        await storageService.save({ authors: newAuthors }, storageKey);
     };
 
     const saveLanguages = async (newLanguages: string[]) => {
         setLanguages(newLanguages);
-        await storageService.save({ languages: newLanguages });
+        await storageService.save({ languages: newLanguages }, storageKey);
     };
 
     const savePublishers = async (newPublishers: string[]) => {
         setPublishers(newPublishers);
-        await storageService.save({ publishers: newPublishers });
+        await storageService.save({ publishers: newPublishers }, storageKey);
     };
 
     const addBook = (bookData: Omit<Book, 'id'>) => {
@@ -164,7 +169,7 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
             storageService.save({
                 authors: newAuthors,
                 books: newBooks
-            });
+            }, storageKey);
         } else {
             // Just save authors if name didn't change (e.g. only photo updated)
             saveAuthors(newAuthors);
