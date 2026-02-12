@@ -15,7 +15,7 @@ const Layout: React.FC = () => {
           <span className="brand-text">ELF</span>
         </div>
         <nav>
-          <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <LayoutDashboard size={20} />
             Dashboard
           </NavLink>

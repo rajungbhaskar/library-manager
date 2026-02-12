@@ -6,7 +6,8 @@ import Insights from './pages/Insights';
 import AddBook from './pages/AddBook';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
-
+import Landing from './pages/Landing';
+import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { LibraryProvider } from './context/LibraryContext';
@@ -18,10 +19,11 @@ function App() {
             <AuthProvider>
                 <LibraryProvider>
                     <Routes>
+                        <Route path="/" element={<Landing />} />
                         <Route path="/signin" element={<SignIn />} />
                         <Route path="/signup" element={<SignUp />} />
-                        <Route path="/" element={<Layout />}>
-                            <Route index element={<Dashboard />} />
+                        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                            <Route path="dashboard" element={<Dashboard />} />
                             <Route path="library" element={<Library />} />
                             <Route path="add" element={<AddBook />} />
                             <Route path="edit/:id" element={<AddBook />} />

@@ -16,7 +16,7 @@ const SignIn: React.FC = () => {
         e.preventDefault();
         try {
             await login({ email, password });
-            navigate('/');
+            navigate('/library');
         } catch (error: any) {
             alert(error.message || 'Failed to sign in');
         }

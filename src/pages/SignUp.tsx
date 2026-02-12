@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
 
         try {
             await register({ name, email, password });
-            navigate('/');
+            navigate('/library');
         } catch (error: any) {
             alert(error.message || 'Failed to sign up');
         }
