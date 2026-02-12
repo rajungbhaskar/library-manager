@@ -81,10 +81,10 @@ const Library: React.FC = () => {
     <div>
       <header className="library-header">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '2rem', fontWeight: '900', color: 'var(--color-text)', letterSpacing: '1px', lineHeight: 1, marginBottom: '0.5rem' }}>
-            <span>MY-S</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '2rem', fontWeight: '900', color: 'var(--color-text)', letterSpacing: '1px', lineHeight: 1, marginBottom: '0.5rem' }}>
+            <span>My-s</span>
             <ShelfIcon size="1.2em" />
-            <span>ELF</span>
+            <span>elf</span>
           </div>
           <p style={{ color: 'var(--color-text-muted)' }}>Where your books belong</p>
         </div>

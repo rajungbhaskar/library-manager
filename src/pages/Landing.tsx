@@ -16,9 +16,9 @@ const Landing: React.FC = () => {
             {/* Navigation Header */}
             <header className="landing-header">
                 <div className="landing-logo">
-                    <span className="logo-text-main">MY-S</span>
+                    <span className="logo-text-main">My-s</span>
                     <ShelfIcon size="1.2em" />
-                    <span className="logo-text-main">ELF</span>
+                    <span className="logo-text-main">elf</span>
                 </div>
                 <div className="landing-nav-actions">
                     <Link to="/signin" className="btn-link">Sign In</Link>
@@ -71,7 +71,7 @@ const Landing: React.FC = () => {
 
             {/* Footer */}
             <footer className="landing-footer">
-                <p>&copy; 2026 My-Shelf. Designed for those who value knowledge.</p>
+                <p>&copy; 2026 My-sHelf. Designed for those who value knowledge.</p>
             </footer>
 
             <style>{`

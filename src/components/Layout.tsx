@@ -10,9 +10,9 @@ const Layout: React.FC = () => {
     <div className="layout">
       <aside className="sidebar">
         <div className="logo">
-          <span className="brand-text">MY-S</span>
+          <span className="brand-text">My-s</span>
           <ShelfIcon size="1.2em" />
-          <span className="brand-text">ELF</span>
+          <span className="brand-text">elf</span>
         </div>
         <nav>
           <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
