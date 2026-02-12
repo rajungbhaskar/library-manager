@@ -21,8 +21,7 @@ const Landing: React.FC = () => {
                     <span className="logo-text-main">elf</span>
                 </div>
                 <div className="landing-nav-actions">
-                    <Link to="/signin" className="btn-link">Sign In</Link>
-                    <Link to="/signup" className="btn btn-primary">Join Now</Link>
+                    <Link to="/library" className="btn btn-primary">Launch App</Link>
                 </div>
             </header>
 
@@ -37,8 +36,7 @@ const Landing: React.FC = () => {
                         Book management for serious readers.
                     </p>
                     <div className="hero-actions">
-                        <Link to="/signup" className="btn btn-primary btn-large">Get Started for Free</Link>
-                        <Link to="/signin" className="btn btn-outline btn-large">Welcome Back</Link>
+                        <Link to="/library" className="btn btn-primary btn-large">Launch App</Link>
                     </div>
                 </div>
 
