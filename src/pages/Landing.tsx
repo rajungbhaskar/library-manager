@@ -16,8 +16,9 @@ const Landing: React.FC = () => {
             {/* Navigation Header */}
             <header className="landing-header">
                 <div className="landing-logo">
-                    <ShelfIcon size="28px" color="var(--color-primary)" />
-                    <span className="logo-text">My-Shelf</span>
+                    <span className="logo-text-main">MY-S</span>
+                    <ShelfIcon size="1.2em" />
+                    <span className="logo-text-main">ELF</span>
                 </div>
                 <div className="landing-nav-actions">
                     <Link to="/signin" className="btn-link">Sign In</Link>
@@ -100,16 +101,15 @@ const Landing: React.FC = () => {
                 .landing-logo {
                     display: flex;
                     align-items: center;
-                    gap: 0.75rem;
+                    gap: 2px;
+                    line-height: 1;
                 }
 
-                .logo-text {
-                    font-size: 1.5rem;
-                    font-weight: 800;
-                    letter-spacing: -0.02em;
-                    background: linear-gradient(135deg, #4f46e5, #6366f1);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
+                .logo-text-main {
+                    font-size: 1.8rem;
+                    font-weight: 900;
+                    letter-spacing: 1px;
+                    color: var(--color-text);
                 }
 
                 .landing-nav-actions {
