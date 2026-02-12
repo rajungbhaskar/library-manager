@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ShelfIcon from '../components/ShelfIcon';
-import { BookOpen, Shield, BarChart3, Cloud } from 'lucide-react';
+import { BookOpen, Shield, BarChart3, HardDrive } from 'lucide-react';
 
 const Landing: React.FC = () => {
     const { isAuthenticated } = useAuth();
@@ -34,8 +34,7 @@ const Landing: React.FC = () => {
                         Elevated.
                     </h1>
                     <p className="hero-subtitle">
-                        A premium book management system for serious readers.
-                        Track your collection, analyze your reading habits, and curate your digital shelf with elegance.
+                        Book management for serious readers.
                     </p>
                     <div className="hero-actions">
                         <Link to="/signup" className="btn btn-primary btn-large">Get Started for Free</Link>
@@ -48,12 +47,12 @@ const Landing: React.FC = () => {
                         <div className="feature-card">
                             <div className="f-icon bg-indigo"><BookOpen size={24} /></div>
                             <h3>Smart Catalog</h3>
-                            <p>Beautifully organized collection with rich metadata.</p>
+                            <p>Organized collection with rich metadata.</p>
                         </div>
                         <div className="feature-card">
                             <div className="f-icon bg-green"><BarChart3 size={24} /></div>
                             <h3>Deep Insights</h3>
-                            <p>Analytics that track your progress and velocity.</p>
+                            <p>Track your progress and velocity.</p>
                         </div>
                         <div className="feature-card">
                             <div className="f-icon bg-amber"><Shield size={24} /></div>
@@ -61,9 +60,9 @@ const Landing: React.FC = () => {
                             <p>Your library is isolated and secure.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="f-icon bg-blue"><Cloud size={24} /></div>
-                            <h3>Cloud Sync</h3>
-                            <p>Access your shelf from any device seamlessly.</p>
+                            <div className="f-icon bg-blue"><HardDrive size={24} /></div>
+                            <h3>Local Control</h3>
+                            <p>Your data stays on your device.</p>
                         </div>
                     </div>
                 </div>
@@ -71,7 +70,7 @@ const Landing: React.FC = () => {
 
             {/* Footer */}
             <footer className="landing-footer">
-                <p>&copy; 2026 My-sHelf. Designed for those who value knowledge.</p>
+                <p>&copy; 2026. All Rights reserved by developer.</p>
             </footer>
 
             <style>{`
